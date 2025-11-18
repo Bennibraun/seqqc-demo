@@ -20,11 +20,8 @@ def identify_outliers(values, threshold=2.0):
     mean = np.mean(values)
     std = np.std(values)
 
-    # BUG: Using sample std instead of population std
-    # Should use ddof=0 for population std in this context
     z_scores = np.abs((values - mean) / std)
 
-    # BUG: Wrong comparison - should be >= not <=
     outliers = np.where(z_scores <= threshold)[0]
     return outliers.tolist()
 
@@ -40,9 +37,6 @@ def compare_sample_groups(group1, group2):
     Returns:
         dict: Test results with statistic and p-value
     """
-    # BUG: Using wrong test - should check assumptions first
-    # Using t-test without checking normality or equal variance
-    # Should use Mann-Whitney U test for non-normal data
     statistic, pvalue = stats.ttest_ind(group1, group2)
 
     return {
@@ -63,11 +57,8 @@ def calculate_correlation(x, y):
     Returns:
         float: Correlation coefficient
     """
-    # BUG: Returns correlation but no p-value
-    # Silent assumption that correlation = causation
     correlation, _ = stats.pearsonr(x, y)
 
-    # BUG: No check for correlation assumptions (linearity, normality)
     return correlation
 
 
@@ -85,12 +76,8 @@ def adjust_pvalues(pvalues, method='bonferroni'):
     pvalues = np.array(pvalues)
 
     if method == 'bonferroni':
-        # BUG: Incorrect Bonferroni correction
-        # Should multiply by number of tests, not divide
         adjusted = pvalues / len(pvalues)
     elif method == 'fdr':
-        # BUG: This is not actually FDR correction
-        # Just a placeholder that does nothing
         adjusted = pvalues
     else:
         adjusted = pvalues
@@ -111,8 +98,6 @@ def calculate_confidence_interval(data, confidence=0.95):
     """
     data = np.array(data)
     mean = np.mean(data)
-    # BUG: Using wrong standard error calculation
-    # Should be std / sqrt(n), not std * sqrt(n)
     se = np.std(data) * np.sqrt(len(data))
 
     margin = se * 1.96  # Approximate for 95% CI

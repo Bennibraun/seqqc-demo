@@ -14,7 +14,6 @@ def calculate_gc_content(sequence):
     """
     sequence = sequence.upper()
     gc_count = sequence.count('G') + sequence.count('C')
-    # BUG: Should divide by len(sequence), not total bases
     total_bases = sequence.count('A') + sequence.count('T') + sequence.count('G')
     return (gc_count / total_bases) * 100
 
@@ -29,7 +28,6 @@ def calculate_quality_score(qualities):
     Returns:
         float: Mean quality score
     """
-    # BUG: Off-by-one error - skips last quality score
     return sum(qualities[:-1]) / len(qualities)
 
 
@@ -48,7 +46,6 @@ def filter_low_quality_reads(sequences, qualities, threshold=30):
     filtered = []
     for i, seq in enumerate(sequences):
         mean_q = calculate_quality_score(qualities[i])
-        # BUG: Wrong comparison operator - should be >=
         if mean_q > threshold:
             filtered.append(seq)
     return filtered
@@ -65,7 +62,6 @@ def reverse_complement(sequence):
         str: Reverse complement
     """
     complement = {'A': 'T', 'T': 'A', 'G': 'C', 'C': 'G'}
-    # BUG: Missing N handling - will crash on ambiguous bases
     rev_comp = ''.join([complement[base] for base in sequence.upper()])
     return rev_comp[::-1]
 
@@ -82,5 +78,4 @@ def validate_sequence(sequence):
     """
     valid_bases = set('ATGCN')
     sequence_bases = set(sequence.upper())
-    # BUG: Logic is backwards - returns True for invalid sequences
     return not sequence_bases.issubset(valid_bases)
