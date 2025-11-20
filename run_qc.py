@@ -56,7 +56,7 @@ def run_quality_control(input_file, output_dir):
 
     # Analyze each sample
     results = []
-    for i in range(len(df) - 1):
+    for i in range(len(df)):
         result = analyze_sample(df.iloc[i])
         results.append(result)
 
@@ -74,8 +74,11 @@ def run_quality_control(input_file, output_dir):
     # Compare groups if we have group labels
     if 'group' in df.columns:
         print("Comparing sample groups...")
-        group1_quality = df[df['group'] == 'control']['quality_scores']
-        group2_quality = df[df['group'] == 'treatment']['quality_scores']
+        # Add group labels to results
+        results_df['group'] = df['group'].values
+        
+        group1_quality = results_df[results_df['group'] == 'control']['mean_quality']
+        group2_quality = results_df[results_df['group'] == 'treatment']['mean_quality']
 
         comparison = stats.compare_sample_groups(
             group1_quality.tolist(),

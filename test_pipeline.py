@@ -81,6 +81,39 @@ class TestIntegration(unittest.TestCase):
         self.assertIsInstance(gc, float)
         self.assertIsInstance(qual, float)
 
+    def test_all_samples_analyzed(self):
+        """Test that all samples in CSV are analyzed."""
+        import pandas as pd
+        import run_qc
+        import tempfile
+        import os
+
+        # Create a test CSV with known number of samples
+        test_data = {
+            'sample_id': ['S1', 'S2', 'S3'],
+            'sequence': ['ATGC', 'GGCC', 'AATT'],
+            'quality_scores': ['30,35,40,35', '28,30,32,29', '33,35,37,34'],
+            'group': ['control', 'treatment', 'control']
+        }
+        df = pd.DataFrame(test_data)
+        
+        # Create temporary files
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_file = os.path.join(tmpdir, 'test_input.csv')
+            output_dir = os.path.join(tmpdir, 'output')
+            
+            df.to_csv(input_file, index=False)
+            
+            # Run analysis
+            results = run_qc.run_quality_control(input_file, output_dir)
+            
+            # Verify all samples were analyzed
+            self.assertEqual(len(results), len(test_data['sample_id']))
+            self.assertEqual(
+                set(results['sample_id'].tolist()),
+                set(test_data['sample_id'])
+            )
+
 
 if __name__ == '__main__':
     unittest.main()
